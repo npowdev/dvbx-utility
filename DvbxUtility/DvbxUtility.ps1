@@ -5,28 +5,23 @@ function GetMyModTest {
 
 # Default values
 # $DVBX_CFG_SRV_REL_PATH = '..\..\devilbox'
-$DVBX_CFG_SERVICES = [array]@()
+$Script:DVBX_CFG_SERVICES = [array]@()
 
 
 function DvbxGetConfigFile {
     param ()
 
     $cfg_fn = "dvbx-cfg"
-    Write-Warning "PSScriptRoot: $($Global:PSScriptRoot)" -WarningAction Continue
     $cfg_paths = @(`
-        ("{0}\.dvbx\{1}" -f $Global:PSScriptRoot, $cfg_fn), `
-        ("{0}\.{1}" -f $Global:PSScriptRoot, $cfg_fn)`
+        ("{0}\.dvbx\{1}" -f $Script:PSScriptRoot, $cfg_fn), `
+        ("{0}\.{1}" -f $Script:PSScriptRoot, $cfg_fn)`
     )
-    Write-Warning "cfg_paths:" -WarningAction Continue
-    $cfg_paths | ForEach-Object { Write-Warning ($_) -WarningAction Continue }
 
     $cfg = ""
     foreach ($fn in $cfg_paths) {
-        Write-Warning ("fn: $($fn)") -WarningAction Continue
         if (Test-Path -Path $fn -PathType 'Leaf') { $cfg = $fn; break }
     }
 
-    Write-Warning ("cfg: $($cfg)") -WarningAction Continue
     if ($cfg.Trim() -eq '') {
         throw "Script configuration file not found."
     }
@@ -56,5 +51,3 @@ function DvbxGetConfigContent {
     $s
 }
 
-# Export-ModuleMember -Variable @("DVBX_CFG_SERVICES")
-Export-ModuleMember -Function '*' -Variable '*'

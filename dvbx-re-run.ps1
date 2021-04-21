@@ -2,31 +2,17 @@
 # Configuration and settings
 ########################################################################
 
-Import-Module "$($PSScriptRoot)\DvbxUtility" -Force
+try {
+    . "$($PSScriptRoot)\DvbxUtility\DvbxUtility.ps1"
+    if (!$?) { throw "Source loading fail!" }
+}
+catch {
+    Write-Error "Source loading of DvbxUtility failed!"; exit 128
+}
 
-
-# Default values
-# $DVBX_CFG_SRV_REL_PATH = '..\..\devilbox'
-# $DVBX_CFG_SERVICES = [array]@()
-
-# $dvbx_cfg_files = @(`
-#     ("{0}\.dvbx\dvbx-cfg" -f $PSScriptRoot), `
-#     ("{0}\.dvbx-cfg" -f $PSScriptRoot)`
-# )
-# $dvbx_cfg = ""
-# foreach ($f in $dvbx_cfg_files) {
-#     if (Test-Path -Path $f -PathType 'Leaf') { $dvbx_cfg = $f; break }
-# }
-# if (! (Test-Path -Path $dvbx_cfg)) {
-#     Write-Error ("Source scrip config '$($dvbx_cfg)' not found. Stop!")
-#     exit 1
-# }
-        
-# Invoke-Expression -Command ((Get-Content -Path $dvbx_cfg) -join "`n")
 Invoke-Expression -Command (DvbxGetConfigContent) -ErrorAction Continue
 if (!$?) { Write-Error "Loading configuration failed!"; exit 128 }
-# Remove-Variable -Name 'dvbx_cfg_files' -Force -EA SilentlyContinue -Scope "Script"
-        
+
 GetMyModTest
         
 exit 0
