@@ -2,7 +2,7 @@
 # Load Base Tool: DvbxUtiliy
 ########################################################################
 . "$($PSScriptRoot)\DvbxUtility\DvbxUtility.ps1" $PSScriptRoot
-
+if (!$?) { Write-Warning -Message "Load of DvbxUtiliy may has failed!" -WarningAction Continue }
 
 exit 0
         
