@@ -1,20 +1,9 @@
 ########################################################################
-# Configuration and settings
+# Load Base Tool: DvbxUtiliy
 ########################################################################
+. "$($PSScriptRoot)\DvbxUtility\DvbxUtility.ps1" $PSScriptRoot
 
-try {
-    . "$($PSScriptRoot)\DvbxUtility\DvbxUtility.ps1"
-    if (!$?) { throw "Source loading fail!" }
-}
-catch {
-    Write-Error "Source loading of DvbxUtility failed!"; exit 128
-}
 
-Invoke-Expression -Command (DvbxGetConfigContent) -ErrorAction Continue
-if (!$?) { Write-Error "Loading configuration failed!"; exit 128 }
-
-GetMyModTest
-        
 exit 0
         
 ########################################################################

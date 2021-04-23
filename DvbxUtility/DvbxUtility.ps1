@@ -1,20 +1,33 @@
-function GetMyModTest {
-    param ()
-    Write-Output 'Inside DvbxUtility'
+########################################################################
+# Base Source Load Checks
+########################################################################
+
+#Check: Got Loader Script Path in $args[0] ?
+if ($Script:args.Count -le 0) {
+    throw "Need loader script path as 1st Argumen: No arguments."
 }
+$Script:DVBX_WorkRoot = $Script:args[0]
+if (! (Test-Path -Path $Script:DVBX_WorkRoot -ErrorAction SilentlyContinue)) {
+    throw "Need loader script path as 1st Argumen: Path not valid/found."
+}
+
+
+########################################################################
+# Define Tool Base Functions
+########################################################################
 
 # Default values
 # $DVBX_CFG_SRV_REL_PATH = '..\..\devilbox'
 $Script:DVBX_CFG_SERVICES = [array]@()
 
 
-function DvbxGetConfigFile {
+function Script:DvbxGetConfigFile {
     param ()
 
     $cfg_fn = "dvbx-cfg"
     $cfg_paths = @(`
-        ("{0}\.dvbx\{1}" -f $Script:PSScriptRoot, $cfg_fn), `
-        ("{0}\.{1}" -f $Script:PSScriptRoot, $cfg_fn)`
+        ("{0}\.dvbx\{1}" -f $PSScriptRoot, $cfg_fn), `
+        ("{0}\.{1}" -f $PSScriptRoot, $cfg_fn)`
     )
 
     $cfg = ""
@@ -31,7 +44,7 @@ function DvbxGetConfigFile {
     $cfg
 }
 
-function DvbxGetConfigContent {
+function Script:DvbxGetConfigContent {
     param ()
 
     try {
@@ -51,3 +64,12 @@ function DvbxGetConfigContent {
     $s
 }
 
+########################################################################
+# Load Configurations
+########################################################################
+
+$DVBX_WorkRoot
+
+# Invoke-Expression -Command (DvbxGetConfigContent) -ErrorAction Continue
+# if (!$?) { Write-Error "Loading configuration failed!"; exit 128 }
+        
