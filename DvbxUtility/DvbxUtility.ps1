@@ -2,13 +2,23 @@
 # Base Source Load Checks
 ########################################################################
 
-#Check: Got Loader Script Path in $args[0] ?
+#-----------------------------------------------------------------------
+# Check $args[0]: Got loader script path?
+#-----------------------------------------------------------------------
 if ($Script:args.Count -le 0) {
-    throw "Need loader script path as 1st Argumen: No arguments."
+    throw "Abort: Need loader script path as 1st Argumen - No arguments."
 }
 $Script:DVBX_WorkRoot = $Script:args[0]
-if (! (Test-Path -Path $Script:DVBX_WorkRoot -ErrorAction SilentlyContinue)) {
-    throw "Need loader script path as 1st Argumen: Path not valid/found."
+if (! (Test-Path -Path $Script:DVBX_WorkRoot -PathType Container -ErrorAction SilentlyContinue)) {
+    throw "Abort: Need loader script path as 1st Argumen - Path not valid/found."
+}
+
+#-----------------------------------------------------------------------
+# Check: Is Docker service/deamon running?
+#-----------------------------------------------------------------------
+docker.exe ps 2>&1 >$null
+if (!$? -or ($LASTEXITCODE -ne 0)) {
+    throw ("Abort: Docker service/deamon is not running.")
 }
 
 
