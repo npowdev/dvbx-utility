@@ -23,26 +23,43 @@ if (!$? -or ($LASTEXITCODE -ne 0)) {
 
 
 ########################################################################
-# Define Tool Base Functions
+# Default and Constants-Like Values
 ########################################################################
+
+# Settings Filename
+$Script:DVBX_C_SETTINGS_FILENAME = 'dvbx-settings.json'
+$Script:DVBX_C_SETTINGS_DIRNAME = '.dvbx'
+
+# Create default settings hashtable
+$Script:DVBX_C_SETTINGS_DEFAULTS = @{
+    SettingsDirName = $Script:DVBX_C_SETTINGS_DIRNAME;
+    DevilboxPath    = "..\..\devilbox";
+    LoadServices    = "httpd", "php", "mysql", "bind"
+}
 
 # Default values
 # $DVBX_CFG_SRV_REL_PATH = '..\..\devilbox'
-$Script:DVBX_CFG_SERVICES = [array]@()
+# $Script:DVBX_CFG_SERVICES = [array]@()
 
 
-function Script:DvbxGetConfigFile {
+########################################################################
+# Define Tool Base Functions
+########################################################################
+
+function Script:DvbxGetSettingsFile {
     param ()
 
-    $cfg_fn = "dvbx-cfg"
     $cfg_paths = @(`
-        ("{0}\.dvbx\{1}" -f $PSScriptRoot, $cfg_fn), `
-        ("{0}\.{1}" -f $PSScriptRoot, $cfg_fn)`
+        ("{0}\{1}\{2}" -f $Script:DVBX_WorkRoot, $Script:DVBX_C_SETTINGS_DIRNAME, $Script:DVBX_C_SETTINGS_FILENAME), `
+        ("{0}\.{1}" -f $Script:DVBX_WorkRoot, $Script:DVBX_C_SETTINGS_FILENAME)`
     )
 
     $cfg = ""
     foreach ($fn in $cfg_paths) {
-        if (Test-Path -Path $fn -PathType 'Leaf') { $cfg = $fn; break }
+        if (Test-Path -Path $fn -PathType 'Leaf' -ErrorAction SilentlyContinue) { 
+            $cfg = $fn
+            break 
+        }
     }
 
     if ($cfg.Trim() -eq '') {
@@ -54,32 +71,13 @@ function Script:DvbxGetConfigFile {
     $cfg
 }
 
-function Script:DvbxGetConfigContent {
-    param ()
-
-    try {
-        $f = DvbxGetConfigFile
-    }
-    catch {
-        throw "No configuration file found."
-    }
-    try {
-        $a = @(Get-Content -Path $f -EA SilentlyContinue)
-        if (!$?) { throw 'Cannot find path.' }
-        $s = ($a -join "`n")
-    }
-    catch {
-        throw "Cannot read configuration file '$f'."
-    }
-    $s
-}
-
 ########################################################################
 # Load Configurations
 ########################################################################
 
-$DVBX_WorkRoot
+# Load settings into object
+$Script:DVBX = (Get-Content -LiteralPath (DvbxGetSettingsFile) -Raw | ConvertFrom-Json -Depth 100)
+if (!$?) { Write-Error "Loading settings failed!"; exit 128 }
 
-# Invoke-Expression -Command (DvbxGetConfigContent) -ErrorAction Continue
-# if (!$?) { Write-Error "Loading configuration failed!"; exit 128 }
-        
+$Script:DVBX | Format-List
+$Script:DVBX | Get-Member -MemberType All -Force | Format-Table
