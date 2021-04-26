@@ -4,17 +4,11 @@
 . "$($PSScriptRoot)\DvbxUtility\DvbxUtility.ps1" $PSScriptRoot
 if (!$?) { Write-Warning -Message "Load of DvbxUtiliy may has failed!" -WarningAction Continue }
 
-exit 0
-        
 ########################################################################
 # Script code start here
 ########################################################################
 
-# Check docker service/deamon is running.
-docker.exe ps 2>&1 >$null
-if (!$? -or ($LASTEXITCODE -ne 0)) {
-    Write-Error ("Docker service/deamon is not running. Abort!"); exit 1
-}
+exit 0
 
 # Get some paths.
 $Dvbx_Pwd = $PWD
