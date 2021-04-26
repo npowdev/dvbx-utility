@@ -1,0 +1,10 @@
+{
+  "DevilboxPath": "..\\..\\devilbox",
+  // Test Comment
+  "LoadServices": [
+    "httpd",
+    "php",
+    "mysql",
+    "bind"
+  ]
+}
