@@ -46,7 +46,7 @@ $Script:DVBX_C_SETTINGS_DEFAULTS = @{
 # Define Tool Base Functions
 ########################################################################
 
-function Script:DvbxGetSettingsFile {
+function Script:DvbxGetSettingsFilename {
     param ()
 
     $cfg_paths = @(`
@@ -71,13 +71,70 @@ function Script:DvbxGetSettingsFile {
     $cfg
 }
 
+function Script:DvbxReparseCustomObjectsToHT {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [AllowNull()][AllowEmptyString()][AllowEmptyCollection()]
+        $Object
+    )
+
+    if ( ($null -ne $Object) -and ($Object -is [System.Management.Automation.PSCustomObject]) ) {
+        $ht = @{}
+        ($Object).psobject.properties | ForEach-Object { 
+            $val = DvbxReparseCustomObjectsToHT -Object $_.Value
+            $ht[$_.Name] = $val
+        }
+        return $ht
+    }
+    elseif ( ($null -ne $Object) -and ($Object -is [array]) ) {
+        $ar = @()
+        if ($Object.Count -gt 0 ) {
+            @($Object) | ForEach-Object {
+                $val = DvbxReparseCustomObjectsToHT -Object $_
+                $ar += $val
+            }
+        }
+        return , $ar
+    }
+    else {
+        return $Object
+    }
+}
+
+function Script:DvbxLoadJsonFile {
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateScript( { Test-Path -LiteralPath $_ -ErrorAction SilentlyContinue })]
+        [string]$File
+    )
+    
+    # Read json file
+    $json = Get-Content -LiteralPath ($File) -Raw -EA SilentlyContinue
+    if (!$?) { throw ([System.Management.Automation.ErrorRecord]$Error[0]).Exception }
+
+    # Convert from json to object
+    $pscobj = (ConvertFrom-Json $json -Depth 100 -EA SilentlyContinue )
+    if (!$?) { throw ([System.Management.Automation.ErrorRecord]$Error[0]).Exception }
+    
+    # Reparse hierarhy structure of custom objects to enumerable hashtables
+    $ht = @{}
+    $ht = DvbxReparseCustomObjectsToHT -Object $pscobj
+    if (!$?) { throw [System.FormatException]::new("Reparse object data failed.") }
+    
+    # Return hierarhy structure
+    return $ht
+}
+
 ########################################################################
 # Load Configurations
 ########################################################################
 
 # Load settings into object
-$Script:DVBX = (Get-Content -LiteralPath (DvbxGetSettingsFile) -Raw | ConvertFrom-Json -Depth 100)
+# $Script:DVBX = (Get-Content -LiteralPath (DvbxGetSettingsFilename) -Raw | ConvertFrom-Json -Depth 100)
+$Script:DVBX = DvbxLoadJsonFile -File (DvbxGetSettingsFilename)
 if (!$?) { Write-Error "Loading settings failed!"; exit 128 }
 
 $Script:DVBX | Format-List
-$Script:DVBX | Get-Member -MemberType All -Force | Format-Table
+# $Script:DVBX | Get-Member -MemberType All -Force | Format-Table
