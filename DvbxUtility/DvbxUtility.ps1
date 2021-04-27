@@ -79,24 +79,40 @@ function Script:DvbxReparseCustomObjectsToHT {
         $Object
     )
 
+    # Is Object not null and a PSCustomObject type?
     if ( ($null -ne $Object) -and ($Object -is [System.Management.Automation.PSCustomObject]) ) {
+        # Get new hashtable to parse in.
         $ht = @{}
+        # Loop through properties, and parse and add each into the hashtable.
         ($Object).psobject.properties | ForEach-Object { 
+            # Parse property value and sub-values if any.
             $val = DvbxReparseCustomObjectsToHT -Object $_.Value
+            # Set parsed value into new hashtable.
             $ht[$_.Name] = $val
         }
+        # Pass back the new hashtable.
         return $ht
     }
+    # ... or is Object not null and an Array type?
     elseif ( ($null -ne $Object) -and ($Object -is [array]) ) {
+        # Get new array to parse in.
         $ar = @()
+        # Is the Object value not an empty array, and ...
+        # do we have anything to work on?
         if ($Object.Count -gt 0 ) {
+            # Loop through items, and parse and add each into the array.
             @($Object) | ForEach-Object {
+                # Parse value and sub-values if any.
                 $val = DvbxReparseCustomObjectsToHT -Object $_
+                # Set parsed value into new array.
                 $ar += $val
             }
         }
+        # Pass back the new array, and guarantee that ...
+        # ... it's an array even if empty or one value array.
         return , $ar
     }
+    # ... or else do nothing and pass back Object unmodified.
     else {
         return $Object
     }
@@ -132,7 +148,6 @@ function Script:DvbxLoadJsonFile {
 ########################################################################
 
 # Load settings into object
-# $Script:DVBX = (Get-Content -LiteralPath (DvbxGetSettingsFilename) -Raw | ConvertFrom-Json -Depth 100)
 $Script:DVBX = DvbxLoadJsonFile -File (DvbxGetSettingsFilename)
 if (!$?) { Write-Error "Loading settings failed!"; exit 128 }
 
