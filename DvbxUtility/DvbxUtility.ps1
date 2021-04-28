@@ -3,8 +3,8 @@
 ########################################################################
 
 #-----------------------------------------------------------------------
-# Check $args[0]: Got loader script path?
-#-----------------------------------------------------------------------
+#region Check $args[0]: Got loader script path?
+
 if ($Script:args.Count -le 0) {
     throw "Abort: Need loader script path as 1st Argumen - No arguments."
 }
@@ -13,14 +13,16 @@ if (! (Test-Path -Path $Script:DVBX_WorkRoot -PathType Container -ErrorAction Si
     throw "Abort: Need loader script path as 1st Argumen - Path not valid/found."
 }
 
+#endregion -------------------------------------------------------------
+
 #-----------------------------------------------------------------------
-# Check: Is Docker service/deamon running?
-#-----------------------------------------------------------------------
+#region Check: Is Docker service/deamon running?
+
 docker.exe ps 2>&1 >$null
 if (!$? -or ($LASTEXITCODE -ne 0)) {
     throw ("Abort: Docker service/deamon is not running.")
 }
-
+#endregion -------------------------------------------------------------
 
 ########################################################################
 # Default and Constants-Like Values
@@ -29,18 +31,6 @@ if (!$? -or ($LASTEXITCODE -ne 0)) {
 # Settings Filename
 $Script:DVBX_C_SETTINGS_FILENAME = 'dvbx-settings.json'
 $Script:DVBX_C_SETTINGS_DIRNAME = '.dvbx'
-
-# Create default settings hashtable
-$Script:DVBX_C_SETTINGS_DEFAULTS = @{
-    SettingsDirName = $Script:DVBX_C_SETTINGS_DIRNAME;
-    DevilboxPath    = "..\..\devilbox";
-    LoadServices    = "httpd", "php", "mysql", "bind"
-}
-
-# Default values
-# $DVBX_CFG_SRV_REL_PATH = '..\..\devilbox'
-# $Script:DVBX_CFG_SERVICES = [array]@()
-
 
 ########################################################################
 # Define Tool Base Functions
@@ -166,19 +156,42 @@ function Script:DvbxLoadJsonFile {
 # Load Configurations
 ########################################################################
 
-# Get settings file pathname.
-$dvbx_fn = DvbxGetSettingsFilename
-# Do we got pathname/file for use? 
-if ($dvbx_fn.Trim()) {
-    # Load settings into object (a hashtable).
-    $Script:DVBX = DvbxLoadJsonFile -File ($dvbx_fn)
-    if (!$?) { Write-Error "Loading settings failed!"; exit 128 }
+function Script:DvbxLoadSettings {
+    param ()
+
+    # Default settings values.
+    $Local:settings_defaults = @{
+        SettingsDirectory = $Script:DVBX_C_SETTINGS_DIRNAME;
+        DevilboxPath      = "..\..\devilbox";
+        LoadServices      = "httpd", "php", "mysql", "bind";
+    }
+    
+    # Get a new empty HT to collect settings
+    $settings = @{}
+
+    # Get settings file pathname.
+    $dvbx_fn = DvbxGetSettingsFilename
+    # Do we got pathname/file for use? 
+    if ($dvbx_fn.Trim()) {
+        # Load settings into object (as hashtable).
+        $settings = DvbxLoadJsonFile -File ($dvbx_fn)
+        if (!$?) { throw "Loading settings file failed!" }
+    }
+    
+    # Add default seetings to HT for missing default settings.
+    $Local:settings_defaults.GetEnumerator() | ForEach-Object {
+        # Is $_.Key missing?
+        if (!$settings.ContainsKey($_.Key)) {
+            # Set missed hash key value pair.
+            $settings[$_.Key] = $Local:settings_defaults[$_.Key]
+        }
+    }
+    
+    # Pass back result
+    return $settings
 }
-# ... else set an empty hashtable for further use as empty settings.
-else {
-    Write-Warning 'No settings file. Skip, and use defaults only.' -WarningAction Continue
-    $Script:DVBX = @{}
-}
+
+$Script:DVBX = DvbxLoadSettings
 
 $Script:DVBX | Format-List
 # $Script:DVBX | Get-Member -MemberType All -Force | Format-Table
