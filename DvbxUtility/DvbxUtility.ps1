@@ -46,29 +46,48 @@ $Script:DVBX_C_SETTINGS_DEFAULTS = @{
 # Define Tool Base Functions
 ########################################################################
 
+function Script:DvbxDefaultSettingsFilename {
+    [OutputType([System.String])]
+    param ()
+    
+    return [string]("{0}\{1}\{2}" -f $Script:DVBX_WorkRoot, 
+        $Script:DVBX_C_SETTINGS_DIRNAME, 
+        $Script:DVBX_C_SETTINGS_FILENAME
+    )
+}
+
 function Script:DvbxGetSettingsFilename {
     param ()
 
-    $cfg_paths = @(`
-        ("{0}\{1}\{2}" -f $Script:DVBX_WorkRoot, $Script:DVBX_C_SETTINGS_DIRNAME, $Script:DVBX_C_SETTINGS_FILENAME), `
-        ("{0}\.{1}" -f $Script:DVBX_WorkRoot, $Script:DVBX_C_SETTINGS_FILENAME)`
+    # Set possible pathnames of settings files in priority order.
+    $settings_file_paths = @(
+        (DvbxDefaultSettingsFilename), 
+        ("{0}\.{1}" -f $Script:DVBX_WorkRoot, $Script:DVBX_C_SETTINGS_FILENAME)
     )
 
-    $cfg = ""
-    foreach ($fn in $cfg_paths) {
-        if (Test-Path -Path $fn -PathType 'Leaf' -ErrorAction SilentlyContinue) { 
-            $cfg = $fn
+    # Set default return value (if no settings file get found).
+    $settings_file = ""
+
+    # Loop through possible pathnames of settings files and ...
+    # find the first file that exist.
+    foreach ($file in $settings_file_paths) {
+        # Do $file file exist?
+        if (Test-Path -Path $file -PathType 'Leaf' -EA SilentlyContinue) { 
+            # Set pathname and break loop.
+            $settings_file = $file
             break 
         }
     }
 
-    if ($cfg.Trim() -eq '') {
-        throw "Script configuration file not found."
+    # Do we found a file and is pathname Invalid?
+    if (($settings_file.Trim() -ne '') -and 
+        (!(Test-Path -Path $settings_file -IsValid -EA SilentlyContinue)) 
+    ) {
+        throw "Settings file pathname '$($settings_file)' is not valid."
     }
-    if (! (Test-Path -Path $cfg -ErrorAction SilentlyContinue)) {
-        throw "Script configuration file '$($cfg)' not found."
-    }
-    $cfg
+
+    # Return value of settings file full pathname.
+    return [string]$settings_file
 }
 
 function Script:DvbxReparseCustomObjectsToHT {
@@ -147,9 +166,19 @@ function Script:DvbxLoadJsonFile {
 # Load Configurations
 ########################################################################
 
-# Load settings into object
-$Script:DVBX = DvbxLoadJsonFile -File (DvbxGetSettingsFilename)
-if (!$?) { Write-Error "Loading settings failed!"; exit 128 }
+# Get settings file pathname.
+$dvbx_fn = DvbxGetSettingsFilename
+# Do we got pathname/file for use? 
+if ($dvbx_fn.Trim()) {
+    # Load settings into object (a hashtable).
+    $Script:DVBX = DvbxLoadJsonFile -File ($dvbx_fn)
+    if (!$?) { Write-Error "Loading settings failed!"; exit 128 }
+}
+# ... else set an empty hashtable for further use as empty settings.
+else {
+    Write-Warning 'No settings file. Skip, and use defaults only.' -WarningAction Continue
+    $Script:DVBX = @{}
+}
 
 $Script:DVBX | Format-List
 # $Script:DVBX | Get-Member -MemberType All -Force | Format-Table
