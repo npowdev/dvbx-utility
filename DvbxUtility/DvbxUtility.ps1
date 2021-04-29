@@ -29,8 +29,10 @@ if (!$? -or ($LASTEXITCODE -ne 0)) {
 ########################################################################
 
 # Settings Filename
-$Script:DVBX_C_SETTINGS_FILENAME = 'dvbx-settings.json'
-$Script:DVBX_C_SETTINGS_DIRNAME = '.dvbx'
+# Readonly $Script:DVBX_C_SETTINGS_FILENAME = 'dvbx-settings.json'
+Set-Variable DVBX_C_SETTINGS_FILENAME ('dvbx-settings.json') -Scope Script -Option ReadOnly -Force
+# Readonly $Script:DVBX_C_SETTINGS_DIRNAME = '.dvbx'
+Set-Variable DVBX_C_SETTINGS_DIRNAME ('.dvbx') -Scope Script -Option ReadOnly -Force
 
 ########################################################################
 # Define Tool Base Functions
@@ -191,7 +193,8 @@ function Script:DvbxLoadSettings {
     return $settings
 }
 
-$Script:DVBX = DvbxLoadSettings
+# $Script:DVBX = DvbxLoadSettings
+Set-Variable DVBX (DvbxLoadSettings) -Scope Script -Option ReadOnly -Force
 
 $Script:DVBX | Format-List
 # $Script:DVBX | Get-Member -MemberType All -Force | Format-Table
