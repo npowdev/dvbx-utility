@@ -158,6 +158,43 @@ function Script:DvbxLoadJsonFile {
 # Load Configurations
 ########################################################################
 
+function DvbxLoadDefaultSettings {
+    [CmdletBinding()]
+    param (
+        # A Hashtable/OrderedDictionary object to be filled with settings.
+        [Parameter(Mandatory = $true, Position = 0)]
+        [Alias('S')]
+        # [hashtable]
+        $Settings,
+        # A Switch parameter to force set of existing settings.
+        [Parameter(Mandatory = $false, Position = 1)]
+        [switch]$Force
+    )
+
+    # Vaalidate parameter Settings is of type Hashtable/OrderedDictionary.
+    if ((!($Settings -is [hashtable])) -and
+        (!($Settings -is [System.Collections.Specialized.OrderedDictionary]))
+    ) { 
+        throw 'Need a hashtable or an ordered hashtable object.' 
+    }
+
+    # Collection of the default settings values.
+    $Local:settings_defaults = @{
+        SettingsDirectory = $Script:DVBX_C_SETTINGS_DIRNAME;
+        DevilboxPath      = "..\..\devilbox";
+        LoadServices      = "httpd", "php", "mysql", "bind";
+    }
+
+    # Add the default settings as needed.
+    $Local:settings_defaults.GetEnumerator() | ForEach-Object {
+        # Is $_.Key missing or are we forced to set?
+        if ( (!$Settings.Contains($_.Key)) -or $Force ) {
+            # Set missed hash key value pair.
+            $Settings[$_.Key] = $Local:settings_defaults[$_.Key]
+        }
+    }
+}
+
 function Script:DvbxLoadSettings {
     param ()
 
@@ -198,3 +235,8 @@ Set-Variable DVBX (DvbxLoadSettings) -Scope Script -Option ReadOnly -Force
 
 $Script:DVBX | Format-List
 # $Script:DVBX | Get-Member -MemberType All -Force | Format-Table
+
+# $o = @{}
+# $o = [ordered]@{}
+# DvbxLoadDefaultSettings -Settings $o
+# $o | Format-List
