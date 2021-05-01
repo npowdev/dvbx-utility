@@ -6,17 +6,5 @@
     "php",
     "mysql",
     "bind"
-  ],
-  // "SubBool": false,
-  // "SubArr": [
-  //   "xxx"
-  // ],
-  "SubObj": {
-    "A": 1,
-    "B": {
-      "B1": "",
-      "B2": []
-    },
-    "C": 2
-  }
+  ]
 }
