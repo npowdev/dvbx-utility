@@ -3,13 +3,16 @@
 ########################################################################
 
 #-----------------------------------------------------------------------
-#region Check $args[0]: Got loader script path?
+#region Check $args[0]: Got loader script path and set in DVBX_WorkRoot?
 
+# Has args?
 if ($Script:args.Count -le 0) {
     throw "Abort: Need loader script path as 1st Argumen - No arguments."
 }
-$Script:DVBX_WorkRoot = $Script:args[0]
-if (! (Test-Path -Path $Script:DVBX_WorkRoot -PathType Container -ErrorAction SilentlyContinue)) {
+# Set root work directory.
+Set-Variable DVBX_WorkRoot ($Script:args[0]) -Scope Script -Option ReadOnly -Force
+# Check to be a container path.
+if (! (Test-Path -Path $Script:DVBX_WorkRoot -PathType Container -EA SilentlyContinue)) {
     throw "Abort: Need loader script path as 1st Argumen - Path not valid/found."
 }
 
@@ -28,9 +31,9 @@ if (!$? -or ($LASTEXITCODE -ne 0)) {
 # Default and Constants-Like Values
 ########################################################################
 
-# Settings Filename - readonly $Script:DVBX_C_SETTINGS_FILENAME = 'dvbx-settings.json'
+# Constant value of settings filename.
 Set-Variable DVBX_C_SETTINGS_FILENAME ('dvbx-settings.json') -Scope Script -Option ReadOnly -Force
-# Settings Dir Name - readonly $Script:DVBX_C_SETTINGS_DIRNAME = '.dvbx'
+# Constant value of Settings directory name.
 Set-Variable DVBX_C_SETTINGS_DIRNAME ('.dvbx') -Scope Script -Option ReadOnly -Force
 
 ########################################################################
@@ -154,10 +157,6 @@ function Script:DvbxLoadJsonFile {
     return $htResult
 }
 
-########################################################################
-# Load Configurations
-########################################################################
-
 function DvbxLoadDefaultSettings {
     [CmdletBinding()]
     param (
@@ -258,6 +257,10 @@ function Script:DvbxIntSettings {
     # Load user settings values from current settings file.
     DvbxLoadUserSettings -Settings $Settings
 }
+
+########################################################################
+# Load Configurations
+########################################################################
 
 # Create empty script settings object.
 Set-Variable -Name DVBX -Value (@{}) -Scope Script -Option ReadOnly -Force
