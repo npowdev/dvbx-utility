@@ -40,7 +40,7 @@ Set-Variable DVBX_C_SETTINGS_DIRNAME ('.dvbx') -Scope Script -Option ReadOnly -F
 # Define Tool Base Functions
 ########################################################################
 
-function Script:DvbxGetSettingsFilePathnames {
+function DvbxGetSettingsFilePathnames {
     [OutputType([System.String[]])]
     param ()
     
@@ -53,7 +53,7 @@ function Script:DvbxGetSettingsFilePathnames {
     )
 }
 
-function Script:DvbxGetCurrentSettingsFile {
+function DvbxGetCurrentSettingsFile {
     [OutputType([System.String])]
     param ()
 
@@ -85,7 +85,7 @@ function Script:DvbxGetCurrentSettingsFile {
     return [string]$currentFile
 }
 
-function Script:DvbxReparseCustomObjectsToHT {
+function DvbxReparseCustomObjectsToHT {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0)]
@@ -132,7 +132,7 @@ function Script:DvbxReparseCustomObjectsToHT {
     }
 }
 
-function Script:DvbxLoadJsonFile {
+function DvbxLoadJsonFile {
     param (
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -194,7 +194,7 @@ function DvbxLoadDefaultSettings {
     }
 }
 
-function Script:DvbxLoadUserSettings {
+function DvbxLoadUserSettings {
     [CmdletBinding()]
     param (
         # A Hashtable/OrderedDictionary object to be filled with settings.
@@ -231,7 +231,7 @@ function Script:DvbxLoadUserSettings {
     }
 }
 
-function Script:DvbxIntSettings {
+function DvbxIntSettings {
     [CmdletBinding()]
     param (
         # A Hashtable/OrderedDictionary object to be filled with settings.
