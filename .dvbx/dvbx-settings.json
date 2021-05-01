@@ -7,10 +7,10 @@
     "mysql",
     "bind"
   ],
-  "SubBool": false,
-  "SubArr": [
-    "xxx"
-  ],
+  // "SubBool": false,
+  // "SubArr": [
+  //   "xxx"
+  // ],
   "SubObj": {
     "A": 1,
     "B": {
