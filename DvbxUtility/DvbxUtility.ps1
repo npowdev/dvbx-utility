@@ -28,34 +28,34 @@ if (!$? -or ($LASTEXITCODE -ne 0)) {
 # Default and Constants-Like Values
 ########################################################################
 
-# Settings Filename
-# Readonly $Script:DVBX_C_SETTINGS_FILENAME = 'dvbx-settings.json'
+# Settings Filename - readonly $Script:DVBX_C_SETTINGS_FILENAME = 'dvbx-settings.json'
 Set-Variable DVBX_C_SETTINGS_FILENAME ('dvbx-settings.json') -Scope Script -Option ReadOnly -Force
-# Readonly $Script:DVBX_C_SETTINGS_DIRNAME = '.dvbx'
+# Settings Dir Name - readonly $Script:DVBX_C_SETTINGS_DIRNAME = '.dvbx'
 Set-Variable DVBX_C_SETTINGS_DIRNAME ('.dvbx') -Scope Script -Option ReadOnly -Force
 
 ########################################################################
 # Define Tool Base Functions
 ########################################################################
 
-function Script:DvbxDefaultSettingsFilename {
-    [OutputType([System.String])]
+function Script:DvbxGetSettingsFilePathnames {
+    [OutputType([System.String[]])]
     param ()
     
-    return [string]("{0}\{1}\{2}" -f $Script:DVBX_WorkRoot, 
-        $Script:DVBX_C_SETTINGS_DIRNAME, 
-        $Script:DVBX_C_SETTINGS_FILENAME
+    return [string[]]@(
+        ("{0}\{1}\{2}" -f $Script:DVBX_WorkRoot, 
+            $Script:DVBX_C_SETTINGS_DIRNAME, 
+            $Script:DVBX_C_SETTINGS_FILENAME)
+        ("{0}\.{1}" -f $Script:DVBX_WorkRoot, 
+            $Script:DVBX_C_SETTINGS_FILENAME)
     )
 }
 
-function Script:DvbxGetSettingsFilename {
+function Script:DvbxGetCurrentSettingsFile {
+    [OutputType([System.String])]
     param ()
 
-    # Set possible pathnames of settings files in priority order.
-    $filePaths = @(
-        (DvbxDefaultSettingsFilename), 
-        ("{0}\.{1}" -f $Script:DVBX_WorkRoot, $Script:DVBX_C_SETTINGS_FILENAME)
-    )
+    # Get possible pathnames of settings files in priority order.
+    $filePaths = DvbxGetSettingsFilePathnames
 
     # Set default return value (if no settings file get found).
     $currentFile = ""
@@ -72,7 +72,7 @@ function Script:DvbxGetSettingsFilename {
     }
 
     # Do we found a file and is pathname Invalid?
-    if (($currentFile.Trim() -ne '') -and 
+    if (($currentFile -ne '') -and 
         (!(Test-Path -Path $currentFile -IsValid -EA SilentlyContinue)) 
     ) {
         throw "Settings file pathname '$($currentFile)' is not valid."
@@ -138,20 +138,20 @@ function Script:DvbxLoadJsonFile {
     )
     
     # Read json file
-    $json = Get-Content -LiteralPath ($File) -Raw -EA SilentlyContinue
+    $jsonContent = Get-Content -LiteralPath ($File) -Raw -EA SilentlyContinue
     if (!$?) { throw ([System.Management.Automation.ErrorRecord]$Error[0]).Exception }
 
     # Convert from json to object
-    $pscobj = (ConvertFrom-Json $json -Depth 100 -EA SilentlyContinue )
+    $psObject = (ConvertFrom-Json $jsonContent -Depth 100 -EA SilentlyContinue )
     if (!$?) { throw ([System.Management.Automation.ErrorRecord]$Error[0]).Exception }
     
     # Reparse hierarhy structure of custom objects to enumerable hashtables
-    $ht = @{}
-    $ht = DvbxReparseCustomObjectsToHT -Object $pscobj
+    $htResult = @{}
+    $htResult = DvbxReparseCustomObjectsToHT -Object $psObject
     if (!$?) { throw [System.FormatException]::new("Reparse object data failed.") }
     
     # Return hierarhy structure
-    return $ht
+    return $htResult
 }
 
 ########################################################################
@@ -182,7 +182,7 @@ function DvbxLoadDefaultSettings {
     $Local:htDefaults = @{
         SettingsDirectory = $Script:DVBX_C_SETTINGS_DIRNAME;
         DevilboxPath      = "..\..\devilbox";
-        LoadServices      = "httpd", "php", "mysql", "bind";
+        LoadServices      = @();
     }
 
     # Add the default settings as needed.
@@ -195,7 +195,7 @@ function DvbxLoadDefaultSettings {
     }
 }
 
-function Script:DvbxLoadSettings {
+function Script:DvbxLoadUserSettings {
     [CmdletBinding()]
     param (
         # A Hashtable/OrderedDictionary object to be filled with settings.
@@ -213,22 +213,22 @@ function Script:DvbxLoadSettings {
     }
 
     # Get a new empty HT to collect loaded settings
-    $Local:htLoaded = @{}
+    $Local:settingsLoaded = @{}
 
     # Get settings file pathname.
-    $fn = DvbxGetSettingsFilename
+    $Local:currentFile = DvbxGetCurrentSettingsFile
     
-    # Do we got pathname/file for use? 
-    if ($fn.Trim()) {
+    # Do we got/has a pathname/file for use? 
+    if ($Local:currentFile.Trim()) {
         # Load and get settings as hashtable object.
-        $Local:htLoaded = DvbxLoadJsonFile -File ($fn)
+        $Local:settingsLoaded = DvbxLoadJsonFile -File ($Local:currentFile)
         if (!$?) { throw "Loading settings file failed!" }
-    }
-    
-    # Add/Set file seetings from HT into parameter $Settings.
-    $Local:htLoaded.GetEnumerator() | ForEach-Object {
-        # Sets the new loaded settings in the $Settings parameter over defaults.
-        $Settings[$_.Key] = $Local:htLoaded[$_.Key]
+        
+        # Add/Set file seetings from HT into parameter $Settings.
+        $Local:settingsLoaded.GetEnumerator() | ForEach-Object {
+            # Sets the new loaded settings in the $Settings parameter over defaults.
+            $Settings[$_.Key] = $Local:settingsLoaded[$_.Key]
+        }
     }
 }
 
@@ -255,19 +255,14 @@ function Script:DvbxIntSettings {
     # Load default settings values.
     DvbxLoadDefaultSettings -Settings $Settings -Force
     
-    # Load default settings values.
-    DvbxLoadSettings -Settings $Settings
+    # Load user settings values from current settings file.
+    DvbxLoadUserSettings -Settings $Settings
 }
 
-# $Script:DVBX = DvbxLoadSettings
-# Set-Variable DVBX (DvbxLoadSettings) -Scope Script -Option ReadOnly -Force
+# Create empty script settings object.
 Set-Variable -Name DVBX -Value (@{}) -Scope Script -Option ReadOnly -Force
+# Init and load script settings contents into object.
 DvbxIntSettings -Settings $Script:DVBX
 
 $Script:DVBX | Format-List
 # $Script:DVBX | Get-Member -MemberType All -Force | Format-Table
-
-# $o = @{}
-# $o = [ordered]@{}
-# DvbxLoadDefaultSettings -Settings $o
-# $o | Format-List
