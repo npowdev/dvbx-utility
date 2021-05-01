@@ -52,34 +52,34 @@ function Script:DvbxGetSettingsFilename {
     param ()
 
     # Set possible pathnames of settings files in priority order.
-    $settings_file_paths = @(
+    $filePaths = @(
         (DvbxDefaultSettingsFilename), 
         ("{0}\.{1}" -f $Script:DVBX_WorkRoot, $Script:DVBX_C_SETTINGS_FILENAME)
     )
 
     # Set default return value (if no settings file get found).
-    $settings_file = ""
+    $currentFile = ""
 
     # Loop through possible pathnames of settings files and ...
     # find the first file that exist.
-    foreach ($file in $settings_file_paths) {
+    foreach ($file in $filePaths) {
         # Do $file file exist?
         if (Test-Path -Path $file -PathType 'Leaf' -EA SilentlyContinue) { 
             # Set pathname and break loop.
-            $settings_file = $file
+            $currentFile = $file
             break 
         }
     }
 
     # Do we found a file and is pathname Invalid?
-    if (($settings_file.Trim() -ne '') -and 
-        (!(Test-Path -Path $settings_file -IsValid -EA SilentlyContinue)) 
+    if (($currentFile.Trim() -ne '') -and 
+        (!(Test-Path -Path $currentFile -IsValid -EA SilentlyContinue)) 
     ) {
-        throw "Settings file pathname '$($settings_file)' is not valid."
+        throw "Settings file pathname '$($currentFile)' is not valid."
     }
 
     # Return value of settings file full pathname.
-    return [string]$settings_file
+    return [string]$currentFile
 }
 
 function Script:DvbxReparseCustomObjectsToHT {
@@ -171,7 +171,7 @@ function DvbxLoadDefaultSettings {
         [switch]$Force
     )
 
-    # Vaalidate parameter Settings is of type Hashtable/OrderedDictionary.
+    # Validate the Settings parameter is of type Hashtable/OrderedDictionary.
     if ((!($Settings -is [hashtable])) -and
         (!($Settings -is [System.Collections.Specialized.OrderedDictionary]))
     ) { 
@@ -179,59 +179,90 @@ function DvbxLoadDefaultSettings {
     }
 
     # Collection of the default settings values.
-    $Local:settings_defaults = @{
+    $Local:htDefaults = @{
         SettingsDirectory = $Script:DVBX_C_SETTINGS_DIRNAME;
         DevilboxPath      = "..\..\devilbox";
         LoadServices      = "httpd", "php", "mysql", "bind";
     }
 
     # Add the default settings as needed.
-    $Local:settings_defaults.GetEnumerator() | ForEach-Object {
+    $Local:htDefaults.GetEnumerator() | ForEach-Object {
         # Is $_.Key missing or are we forced to set?
         if ( (!$Settings.Contains($_.Key)) -or $Force ) {
             # Set missed hash key value pair.
-            $Settings[$_.Key] = $Local:settings_defaults[$_.Key]
+            $Settings[$_.Key] = $Local:htDefaults[$_.Key]
         }
     }
 }
 
 function Script:DvbxLoadSettings {
-    param ()
+    [CmdletBinding()]
+    param (
+        # A Hashtable/OrderedDictionary object to be filled with settings.
+        [Parameter(Mandatory = $true, Position = 0)]
+        [Alias('S')]
+        # [hashtable]
+        $Settings
+    )
 
-    # Default settings values.
-    $Local:settings_defaults = @{
-        SettingsDirectory = $Script:DVBX_C_SETTINGS_DIRNAME;
-        DevilboxPath      = "..\..\devilbox";
-        LoadServices      = "httpd", "php", "mysql", "bind";
+    # Validate the $Settings parameter is of type Hashtable/OrderedDictionary.
+    if ((!($Settings -is [hashtable])) -and
+        (!($Settings -is [System.Collections.Specialized.OrderedDictionary]))
+    ) { 
+        throw 'Need a hashtable or an ordered hashtable object.' 
     }
-    
-    # Get a new empty HT to collect settings
-    $settings = @{}
+
+    # Get a new empty HT to collect loaded settings
+    $Local:htLoaded = @{}
 
     # Get settings file pathname.
-    $dvbx_fn = DvbxGetSettingsFilename
+    $fn = DvbxGetSettingsFilename
+    
     # Do we got pathname/file for use? 
-    if ($dvbx_fn.Trim()) {
-        # Load settings into object (as hashtable).
-        $settings = DvbxLoadJsonFile -File ($dvbx_fn)
+    if ($fn.Trim()) {
+        # Load and get settings as hashtable object.
+        $Local:htLoaded = DvbxLoadJsonFile -File ($fn)
         if (!$?) { throw "Loading settings file failed!" }
     }
     
-    # Add default seetings to HT for missing default settings.
-    $Local:settings_defaults.GetEnumerator() | ForEach-Object {
-        # Is $_.Key missing?
-        if (!$settings.ContainsKey($_.Key)) {
-            # Set missed hash key value pair.
-            $settings[$_.Key] = $Local:settings_defaults[$_.Key]
-        }
+    # Add/Set file seetings from HT into parameter $Settings.
+    $Local:htLoaded.GetEnumerator() | ForEach-Object {
+        # Sets the new loaded settings in the $Settings parameter over defaults.
+        $Settings[$_.Key] = $Local:htLoaded[$_.Key]
     }
+}
+
+function Script:DvbxIntSettings {
+    [CmdletBinding()]
+    param (
+        # A Hashtable/OrderedDictionary object to be filled with settings.
+        [Parameter(Mandatory = $true, Position = 0)]
+        [Alias('S')]
+        # [hashtable]
+        $Settings
+    )
+
+    # Validate the Settings parameter is of type Hashtable/OrderedDictionary.
+    if ((!($Settings -is [hashtable])) -and
+        (!($Settings -is [System.Collections.Specialized.OrderedDictionary]))
+    ) { 
+        throw 'Need a hashtable or an ordered hashtable object.' 
+    }
+
+    # Clear HT to be empty and collect settings.
+    $Settings.Clear()
+
+    # Load default settings values.
+    DvbxLoadDefaultSettings -Settings $Settings -Force
     
-    # Pass back result
-    return $settings
+    # Load default settings values.
+    DvbxLoadSettings -Settings $Settings
 }
 
 # $Script:DVBX = DvbxLoadSettings
-Set-Variable DVBX (DvbxLoadSettings) -Scope Script -Option ReadOnly -Force
+# Set-Variable DVBX (DvbxLoadSettings) -Scope Script -Option ReadOnly -Force
+Set-Variable -Name DVBX -Value (@{}) -Scope Script -Option ReadOnly -Force
+DvbxIntSettings -Settings $Script:DVBX
 
 $Script:DVBX | Format-List
 # $Script:DVBX | Get-Member -MemberType All -Force | Format-Table
