@@ -1,6 +1,5 @@
 {
   "DevilboxPath": "..\\..\\devilbox",
-  // Test Comment
   "LoadServices": [
     "httpd",
     "php",
