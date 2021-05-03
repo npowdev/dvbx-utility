@@ -179,9 +179,9 @@ function DvbxLoadDefaultSettings {
 
     # Collection of the default settings values.
     $Local:htDefaults = @{
-        SettingsDirectory = $Script:DVBX_C_SETTINGS_DIRNAME;
-        DevilboxPath      = "..\..\devilbox";
-        LoadServices      = @();
+        SettingsDirName = $Script:DVBX_C_SETTINGS_DIRNAME;
+        DevilboxPath    = "..\..\devilbox";
+        LoadServices    = @();
     }
 
     # Add the default settings as needed.
