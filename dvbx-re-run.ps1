@@ -2,22 +2,20 @@
 # Load Base Tool: DvbxUtiliy
 ########################################################################
 . "$($PSScriptRoot)\DvbxUtility\DvbxUtility.ps1" $PSScriptRoot
-if (!$?) { Write-Warning -Message "Load of DvbxUtiliy may has failed!" -WarningAction Continue }
+if (!$?) { Write-Error -Message "Load of DvbxUtiliy may has failed!" -EA Stop }
 
 ########################################################################
-# Script code start here
+# Script code that use DvbxUtility start here
 ########################################################################
-
-Write-Warning ("STOP: Under construction!") -WarningAction Continue
-exit 1
 
 # Get some paths.
-$Dvbx_Pwd = $PWD
-$Dvbx_Project_Path = $PSScriptRoot
-
-Write-Output ("Current path is: $($Dvbx_Pwd)")
-Write-Output ("Project path is: $($Dvbx_Project_Path)")
 Write-Output ("")
+Write-Output ("Current path is: $($PWD)")
+Write-Output ("Project path is: $($DVBX_WorkRoot)")
+
+$DVBX
+
+exit 1
 
 # Resolve devilbox server path.
 $Dvbx_Server_Path = (Resolve-Path -Path (Join-Path -Path $Dvbx_Project_Path -ChildPath $DVBX_CFG_SRV_REL_PATH -ea SilentlyContinue) -EA SilentlyContinue)
