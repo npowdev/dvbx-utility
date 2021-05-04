@@ -266,6 +266,3 @@ function DvbxIntSettings {
 Set-Variable -Name DVBX -Value (@{}) -Scope Script -Option ReadOnly -Force
 # Init and load script settings contents into object.
 DvbxIntSettings -Settings $Script:DVBX
-
-$Script:DVBX | Format-List
-# $Script:DVBX | Get-Member -MemberType All -Force | Format-Table
