@@ -115,20 +115,11 @@ _DvbxUtility_ don't use the typical PowerShell style of a '_Kebab Case_' name co
 
 ### About Variables
 
-_DvbxUtility_ set variables as an type of '_global data_' to be accessible by the user script. This so called '_global data for the user_' get in variables at the script scope. Most of are read only, but values get always updated at every script load.
+_DvbxUtility_ set variables as an type of '_global data_' to be accessible by the user script. This so called '_global data' for the user_ get in variables at the script scope.
 
-As usual by concept, there are two different types of values in variables. Variables of a constant value and variables of a dynamic value.
+There are by concept two different types of values in the variables, and the used naming style depends on the value type.
 
-**_Name convention of Variables:_**
-
-Variable naming convention depend on if the value of a variable is dynamic or constant.
-
-All variables has always a pre-defined capitalized name prefix of the '_Snake Case_' style. For the remaining part of the name a one of the next two styles get used. The '_Pascal Case_' or still '_Snake Case_'.
-
-| Value type |  Prefix   | remaining name style   | Example            |
-| :--------: | :-------: | ---------------------- | ------------------ |
-|  dynamic   |  `DVBX_`  | pascal case            | DVBX_ValueOfThing  |
-|  constanc  | `DVBX_C_` | capitalized snake case | DVBX_C_XY_OF_THING |
+All variables has always a pre-defined capitalized name prefix, and for the remaining part of the name different styles get used.
 
 For more look at [API Variables](dvbx-api-vars.md).
 
