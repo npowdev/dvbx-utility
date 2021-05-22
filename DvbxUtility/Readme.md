@@ -125,15 +125,7 @@ For more look at [API Variables](dvbx-api-vars.md).
 
 ### About Functions
 
-All function names start with a own prefix followed by the remaining part of the name.
-
-**_Name convention of Functions:_**
-
-The functions always uses the '_Pascal Case_' style, by convention.
-
-| Prefix | Name style  | Example        |
-| :----: | :---------: | -------------- |
-| `Dvbx` | Pascal Case | DvbxDoSomeWork |
+The functions that _DvbxUtility_ supply are a set of helper functions for user scripts and itself. All function names start with a prefix followed by the remaining part of the name, and has an own name convention style.
 
 For more look at [API Functions](dvbx-api-functions.md).
 

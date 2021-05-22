@@ -74,6 +74,7 @@ function DvbxGetCurrentSettingsFile {
         }
     }
 
+    # TODO: Next check needs cleanup. Check is not needed!
     # Do we found a file and is pathname Invalid?
     if (($currentFile -ne '') -and 
         (!(Test-Path -Path $currentFile -IsValid -EA SilentlyContinue)) 
