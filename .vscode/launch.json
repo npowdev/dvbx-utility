@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "DBG dvbx-re-run.ps1",
+            "name": "DBG dvbx-restart.ps1",
             "type": "PowerShell",
             "request": "launch",
-            "script": "${workspaceFolder}/dvbx-re-run.ps1",
+            "script": "${workspaceFolder}/dvbx-restart.ps1",
             // "cwd": "${workspaceFolder}"
         },
         {
@@ -16,13 +16,6 @@
             "type": "PowerShell",
             "request": "launch",
             "script": "${workspaceFolder}/temp-dvbx-debug-run.ps1",
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "name": "Pwsh: dvbx-re-run.ps1",
-            "type": "PowerShell",
-            "request": "launch",
-            "script": "${workspaceFolder}/dvbx-re-run.ps1",
             "cwd": "${workspaceFolder}"
         },
         {
