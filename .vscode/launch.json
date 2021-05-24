@@ -5,6 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "DBG dvbx-up.ps1",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/dvbx-up.ps1",
+        },
+        {
             "name": "DBG dvbx-down.ps1",
             "type": "PowerShell",
             "request": "launch",
