@@ -15,7 +15,6 @@
             "type": "PowerShell",
             "request": "launch",
             "script": "${workspaceFolder}/dvbx-restart.ps1",
-            // "cwd": "${workspaceFolder}"
         },
         {
             "name": "DBG with temp-dvbx-debug-run.ps1",
