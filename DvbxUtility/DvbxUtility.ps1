@@ -146,7 +146,14 @@ function DvbxLoadJsonFile {
     if (!$?) { throw ([System.Management.Automation.ErrorRecord]$Error[0]).Exception }
 
     # Convert from json to object
-    $psObject = (ConvertFrom-Json $jsonContent -Depth 100 -EA SilentlyContinue )
+    if ($PSVersionTable.PSVersion.Major -lt 7) {
+        # Run on old PS version not supporting '-Depth' option.
+        $psObject = (ConvertFrom-Json $jsonContent -EA SilentlyContinue )
+    }
+    else {
+        # Run on PS version that support '-Depth' option.
+        $psObject = (ConvertFrom-Json $jsonContent -Depth 100 -EA SilentlyContinue )
+    }
     if (!$?) { throw ([System.Management.Automation.ErrorRecord]$Error[0]).Exception }
     
     # Reparse hierarhy structure of custom objects to enumerable hashtables
