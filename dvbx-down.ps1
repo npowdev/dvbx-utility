@@ -32,9 +32,9 @@ try {
         throw [System.IO.IOException]::new("Failed to go to Devilbox path '$($DVBX_ServerPath)'.") 
     }
     
-    # Do docker container work: stop, remove, start.
+    # Do docker container: down.
     Write-Output ("")
-    Write-Output ("Shut down Devilbox...")
+    Write-Output ("Shuts down Devilbox...")
     docker-compose.exe down
     if (!$? -or ($LASTEXITCODE -ne 0)) {
         throw ("Failed to shut down Devilbox. Abort!")

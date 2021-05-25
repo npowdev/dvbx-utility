@@ -33,6 +33,7 @@ try {
     }
     
     # Do docker container: up.
+    Write-Output ("")
     Write-Output ("Starts up Devilbox...")
     docker-compose.exe "up" -d $DVBX.LoadServices
     if (!$? -or ($LASTEXITCODE -ne 0)) {

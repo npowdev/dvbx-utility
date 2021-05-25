@@ -33,38 +33,31 @@ try {
     }
     
     # Do docker container work: stop, remove, start.
-    try {
-        Write-Output ("")
-        Write-Output ("Stop containers...")
-        docker-compose.exe stop
-        if (!$? -or ($LASTEXITCODE -ne 0)) {
-            throw ("Failed to stop containers. Abort!")
-        }
-        Write-Output ("")
-        
-        Write-Output ("Remove containers...")
-        docker-compose.exe rm -f
-        if (!$? -or ($LASTEXITCODE -ne 0)) {
-            throw ("Failed to remove containers. Abort!")
-        }
-        Write-Output ("")
-        
-        Write-Output ("Start containers...")
-        docker-compose.exe "up" -d $DVBX.LoadServices
-        if (!$? -or ($LASTEXITCODE -ne 0)) {
-            throw ("Failed to start Devilbox. Abort!")
-        }
-        Write-Output ("")
+    Write-Output ("")
+    Write-Output ("Stops Devilbox containers...")
+    docker-compose.exe stop
+    if (!$? -or ($LASTEXITCODE -ne 0)) {
+        throw ("Failed to stop Devilbox containers. Abort!")
     }
-    # Go back to last directory.
-    finally {
-        # Write-Output ("Go Back to last place in: $($Dvbx_Pwd)")
-        Pop-Location
+    Write-Output ("")
+    
+    Write-Output ("Removes Devilbox containers...")
+    docker-compose.exe rm -f
+    if (!$? -or ($LASTEXITCODE -ne 0)) {
+        throw ("Failed to remove Devilbox containers. Abort!")
     }
+    Write-Output ("")
+    
+    Write-Output ("Starts up Devilbox containers...")
+    docker-compose.exe "up" -d $DVBX.LoadServices
+    if (!$? -or ($LASTEXITCODE -ne 0)) {
+        throw ("Failed to start Devilbox containers. Abort!")
+    }
+    Write-Output ("")
 }
 # Go back to start directory.
 finally {
-    Pop-Location -ErrorAction SilentlyContinue
+    Pop-Location -EA SilentlyContinue
 }
 
 Write-Output ("Done.")
