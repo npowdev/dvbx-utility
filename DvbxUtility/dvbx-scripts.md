@@ -51,7 +51,7 @@ It stops all, then removes the containers, and start up again the Devilbox with 
 
 ----
 
-### Script: dvbx-go-there.ps1
+### Script: dvbx-go-devilbox.ps1
 
 Just simply to go to the Devilbox directory and work there.
 
