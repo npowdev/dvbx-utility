@@ -72,3 +72,10 @@ $RECYCLE.BIN/
 *.code-workspace
 # Local History for Visual Studio Code
 .history/
+
+######################################
+# Project: dvbx-init.ps1 FS test dir
+######################################
+
+test-dvbx-init/**
+!test-dvbx-init/.keepme

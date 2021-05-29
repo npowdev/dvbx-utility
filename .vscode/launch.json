@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "DBG dvbx-init.ps1",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/dvbx-init.ps1",
+            "args": [
+                "xdir"
+            ],
+            "cwd": "${workspaceFolder}/test-dvbx-init"
+        },
+        {
             "name": "DBG dvbx-shell.ps1",
             "type": "PowerShell",
             "request": "launch",
