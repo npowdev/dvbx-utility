@@ -58,3 +58,13 @@ Just simply to go to the Devilbox directory and work there.
 > **_Attention:_** The script don't restore the previous location! However, it uses the `Push-Location` command and the stack. So to go back, all  have to (and should) be done is a call to `Pop-Location` / `popd`.
 
 ----
+
+### Script: dvbx-shell.ps1
+
+Enters the _Devilbox_ shell command prompt.
+
+> **_None_:** To get back simply exit that shell.
+
+Internally the script uses `shell.bat` delivered by the _Devilbox_ to get into the command line prompt inside the current php container.
+
+----
