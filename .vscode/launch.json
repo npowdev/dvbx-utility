@@ -23,10 +23,10 @@
             "script": "${workspaceFolder}/dvbx-down.ps1",
         },
         {
-            "name": "DBG dvbx-go-there.ps1",
+            "name": "DBG dvbx-go-devilbox.ps1",
             "type": "PowerShell",
             "request": "launch",
-            "script": "${workspaceFolder}/dvbx-go-there.ps1",
+            "script": "${workspaceFolder}/dvbx-go-devilbox.ps1",
         },
         {
             "name": "DBG dvbx-restart.ps1",
