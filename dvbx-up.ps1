@@ -46,5 +46,5 @@ finally {
     Pop-Location -EA SilentlyContinue
 }
 
-Write-Output ("Done.")
+Write-Output ("Devilbox startup done.")
 Write-Output ("")
