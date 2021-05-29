@@ -31,12 +31,20 @@ try {
     if (! $?) { 
         throw [System.IO.IOException]::new("Failed to go to Devilbox path '$($DVBX_ServerPath)'.") 
     }
+
+    # Call Devilbox shell.
+    Write-Output ("")
+    Write-Output ("Enters Devilbox shell...")
+    cmd.exe /Q /C ".\shell.bat"
+    if (!$? -or ($LASTEXITCODE -ne 0)) {
+        throw ("Failed to enter Devilbox shell. Abort!")
+    }
+    Write-Output ("Shell leaved.")
 }
-catch {
-    # Go back to directory on error.
+# Go back to start directory.
+finally {
     Pop-Location -EA SilentlyContinue
 }
 
-Write-Output ("")
-Write-Output ("Do later use Pop-Location (popd) to go back!")
+Write-Output ("Back again.")
 Write-Output ("")
