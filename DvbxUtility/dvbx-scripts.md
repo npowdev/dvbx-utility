@@ -68,3 +68,40 @@ Enters the _Devilbox_ shell command prompt.
 Internally the script uses `shell.bat` delivered by the _Devilbox_ to get into the command line prompt inside the current php container.
 
 ----
+
+### Script: dvbx-init.ps1
+
+Initializes _DvbxUtility_ into a project by copying all needed files to that place. The project or destination may be given by a parameter (see usage below).
+
+> **_Note:_** If the init destination folder doesn't exists, it will be created, and also any needed but missing subfolder for the copied files would be created.
+
+The source of all needed files is where this script is located, and following files will get copied from the scipt's directory:
+
+- `dvbx-down.ps1`
+- `dvbx-go-devilbox.ps1`
+- `dvbx-restart.ps1`
+- `dvbx-shell.ps1`
+- `dvbx-up.ps1`
+- `DvbxUtility\DvbxUtility.ps1`
+
+But the script (`dvbx-init.ps1`) itself will not get copied!
+
+> **_Important:_** Be aware that any file that get copied and already exists, will be overwritten and will get updated.
+
+**_Usage:_**
+
+```powershell
+path\to\file\dvbx-init.ps1 name
+```
+
+**_Parameters:_**<br>
+
+- **_`name`:_**<br>Optional. The name of a project folder or a path to a directory to work in (see below).
+
+If the `name` parameter is given, the script uses that value as a relative or absolut path of the directory where to do init.
+
+So for ex. a simple name like '_project-xyz_' is interpreted as the relative path to the current directory as `.\project-xyz`.
+
+Without a parameter, the current directory will get used, as if script get `.` (dot) as name parameter value.
+
+----
