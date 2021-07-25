@@ -6,7 +6,7 @@ The _DVBX Utility_ give a set of _PowerShell_ scripts to simplify and speedup th
 
 _DVBX Utility_ consist of folowing main parts:
 
-- Everyday usage script files im root folder,
+- Everyday usage script files in root folder,
 - A subdirectory with the source-load base library script needed by all this scripts.
 - An init script (also in root folder) to prepare scripts for usage in other/new project folders by copy.
 - Some Markdown files as docomentation, but not needed for run.
@@ -31,7 +31,7 @@ For an initialization or integration of the _DVBX Utility_ scripts in a project 
 
 Beside the possibility of doing that by hand, doing that by the [init script](DvbxUtility/dvbx-scripts.md#Script-dvbx-init.ps1) already provided by _DVBX Utility_ is the right way.
 
-#### With the Provided Script ([dvbx-init.ps1](DvbxUtility/dvbx-scripts.md#Script-dvbx-init.ps1))
+#### With the Provided Script ([dvbx-init.ps1](DvbxUtility/dvbx-scripts.md#Script-dvbx-initps1))
 
 ##### Usage:
 
@@ -98,3 +98,5 @@ If a project has to use _DVBX Utility_, copy the needed files into the project a
 Scripts rely on their position in a project directory as they are using relative path to load the base script library, and some additionally also have to call each other.
 
 > **_Note:_** In the 'DvbxUtility' folder are some files of other type like markdown files, but they are not needed for functionality and may be removed on a project. Markdown files are most used for documentation purpose.
+
+---
