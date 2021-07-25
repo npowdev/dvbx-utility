@@ -29,7 +29,7 @@ Proceed with next step below to initialize and [integrate the scripts in a proje
 
 For an initialization or integration of the _DVBX Utility_ scripts in a project where they should work in, they all have to get in that folder.
 
-Beside the possibility of doing that by hand, doing that by the [init script](DvbxUtility/dvbx-scripts.md#Script-dvbx-init.ps1) already provided by _DVBX Utility_ is the right way.
+Beside the possibility of doing that by hand, doing that by the [init script](DvbxUtility/dvbx-scripts.md#Script-dvbx-initps1) already provided by _DVBX Utility_ is the right way.
 
 #### With the Provided Script ([dvbx-init.ps1](DvbxUtility/dvbx-scripts.md#Script-dvbx-initps1))
 
